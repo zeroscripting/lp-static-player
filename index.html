@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <title>BABACAN MEDIA — Preview</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="assets/player.js" defer></script>
+</head>
+<body>
+  <main class="preview-page">
+    <section class="preview-card" aria-label="Pratinjau video">
+      <video
+        class="preview-video"
+        id="previewVideo"
+        muted
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      ></video>
+
+      <!-- Tombol membuka about:blank langsung pada klik (tanpa /watch.html). -->
+      <button id="playButton" class="play-button" type="button" aria-label="Putar video">
+        <span class="play-triangle" aria-hidden="true"></span>
+      </button>
+
+      <p class="video-title" id="videoTitle">Video: CXdziPvQ1</p>
+      <p class="preview-message" id="previewMessage" role="status" hidden>
+        Pratinjau belum tersedia. Tekan Play untuk membuka video.
+      </p>
+      <p class="popup-message" id="popupMessage" role="alert" hidden>
+        Tab baru diblokir browser. Izinkan pop-up untuk situs ini lalu coba lagi.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

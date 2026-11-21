@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0d1117">
+<title>Dashboard — LP Player</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel2: #1c2129;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #2f81f7;
+    --ok: #3fb950;
+    --warn: #d29922;
+    --err: #f85149;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-size: 14px; }
+  a { color: var(--accent); }
+  header {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 10px 16px; background: #010409; border-bottom: 1px solid var(--border);
+  }
+  header h1 { font-size: 15px; margin: 0; font-weight: 600; letter-spacing: .2px; }
+  header .spacer { flex: 1; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 9px; border-radius: 999px; font-size: 12px;
+    border: 1px solid var(--border); color: var(--muted); background: var(--panel);
+  }
+  .pill.ok { color: var(--ok); border-color: #2b5a34; }
+  .pill.err { color: var(--err); border-color: #6b2b28; }
+  .pill.warn { color: var(--warn); border-color: #5c4813; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  main { max-width: 1080px; margin: 0 auto; padding: 16px; display: grid; gap: 16px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; min-width: 0; }
+  .card > h2 {
+    margin: 0; padding: 11px 14px; font-size: 13px; font-weight: 600;
+    border-bottom: 1px solid var(--border); color: var(--text);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card > .body { padding: 14px 14px 18px; display: grid; gap: 12px; }
+  .card > .body > .tabpanel { display: grid; gap: 16px; align-content: start; padding: 4px 0 6px; }
+  .grid2 { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); align-items: start; }
+  label { display: grid; gap: 5px; font-size: 12px; color: var(--muted); }
+  .field { display: grid; gap: 5px; }
+  .field > label { font-size: 12px; color: var(--muted); }
+  textarea { resize: vertical; min-height: 90px; }
+  input, select, textarea {
+    width: 100%; padding: 8px 10px; font: inherit; font-size: 13px;
+    color: var(--text); background: #0d1117;
+    border: 1px solid var(--border); border-radius: 6px;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgb(47 129 247 / 25%);
+  }
+  input[type="checkbox"] { width: auto; accent-color: var(--accent); }
+  .hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin: 0; overflow-wrap: anywhere; }
+  .checkline {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 12px 14px; margin-top: 2px;
+    background: #0d1117; border: 1px solid var(--border); border-radius: 6px;
+    cursor: pointer; min-width: 0;
+  }
+  .checkline > span { min-width: 0; }
+  .checkline input[type="checkbox"] { margin-top: 2px; flex: none; }
+  .checkline .checktitle { display: block; color: var(--text); font-size: 13px; margin-bottom: 4px; }
+  .checkline .hint { display: block; }
+  .checkline code { font-size: 11px; }
+  .row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: 13px; padding: 7px 14px; border-radius: 6px; cursor: pointer;
+    border: 1px solid var(--border); background: var(--panel2); color: var(--text);
+    transition: background .15s ease, border-color .15s ease;
+  }
+  button:hover { background: #262c35; border-color: #444c56; }
+  button:disabled { opacity: .5; cursor: not-allowed; }
+  button.primary { background: #238636; border-color: #2ea043; }
+  button.primary:hover { background: #2ea043; }
+  button.danger { color: var(--err); border-color: #6b2b28; }
+  button.danger:hover { background: #2d1214; }
+  button.ghost { background: transparent; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-size: 13px; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .4px; }
+  tr:last-child td { border-bottom: none; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 12px; }
+  .tabs { display: flex; gap: 4px; padding: 0 14px; border-bottom: 1px solid var(--border); overflow-x: auto; }
+  .tabs button {
+    background: none; border: none; border-bottom: 2px solid transparent; border-radius: 0;
+    padding: 10px 12px; color: var(--muted); font-size: 13px; white-space: nowrap;
+  }
+  .tabs button:hover { background: none; color: var(--text); }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: #f78166; }
+  .tabpanel[hidden], .card > .body > .tabpanel[hidden] { display: none; }
+  #toast {
+    position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(80px);
+    padding: 9px 16px; border-radius: 6px; font-size: 13px; background: #1f6feb;
+    color: #fff; box-shadow: 0 8px 24px rgb(0 0 0 / 50%); opacity: 0;
+    transition: transform .2s ease, opacity .2s ease; pointer-events: none; z-index: 50;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.err { background: #b62324; }
+  .empty { padding: 24px 14px; text-align: center; color: var(--muted); font-size: 13px; }
+  .filebox {
+    background: #0d1117; border: 1px solid var(--border); border-radius: 6px;
+    padding: 10px; font-family: ui-monospace, Consolas, monospace; font-size: 12px;
+    color: var(--muted); overflow-x: auto; white-space: pre;
+  }
+  .linkcell { display: flex; align-items: center; gap: 6px; }
+  .linkcell input { font-size: 11px; padding: 4px 7px; }
+  code { background: #0d1117; border: 1px solid var(--border); border-radius: 4px; padding: 1px 5px; font-size: 12px; }
+  @media (max-width: 640px) {
+    main { padding: 10px; }
+    .hide-sm { display: none; }
+    td, th { padding: 7px 6px; }
+    header { gap: 8px; padding: 8px 12px; }
+    header h1 { flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    #connPill { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>LP Player — Dashboard</h1>
+  <span class="pill" id="connPill"><span class="dot"></span><span id="connText">Belum terhubung</span></span>
+  <span class="pill" id="deployPill" hidden><span class="dot"></span><span id="deployText">—</span></span>
+  <span class="spacer"></span>
+  <button id="saveBtn" class="primary" disabled>Simpan ke GitHub</button>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Koneksi</h2>
+    <div class="body">
+      <div class="field">
+        <label for="fMode">Mode penyimpanan</label>
+        <select id="fMode">
+          <option value="local">Lokal (dev server, tulis ke data/config.json)</option>
+          <option value="github">GitHub (commit lewat API)</option>
+        </select>
+        <span class="hint" id="modeHint"></span>
+      </div>
+
+      <div id="githubFields" class="grid2" hidden>
+        <label>Owner / username
+          <input id="fOwner" placeholder="username" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Repository
+          <input id="fRepo" placeholder="nama-repo" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Branch
+          <input id="fBranch" placeholder="main" value="main" autocomplete="off" spellcheck="false">
+        </label>
+        <label>Personal Access Token
+          <input id="fToken" type="password" placeholder="github_pat_..." autocomplete="off">
+        </label>
+      </div>
+      <div class="row">
+        <button id="connectBtn">Muat config</button>
+        <button id="forgetBtn" class="ghost danger">Hapus kredensial</button>
+      </div>
+      <p class="hint" id="connHint">Token disimpan di localStorage browser ini saja. Fine-grained PAT: izin <code>Contents: Read and write</code> + <code>Actions: Read and write</code> pada repo tersebut.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="videos">Video</button>
+      <button role="tab" aria-selected="false" data-tab="site">Situs</button>
+      <button role="tab" aria-selected="false" data-tab="ads">Iklan</button>
+      <button role="tab" aria-selected="false" data-tab="deploy">Deploy</button>
+      <button role="tab" aria-selected="false" data-tab="json">JSON</button>
+    </div>
+
+    <div class="body">
+      <div class="tabpanel" id="panel-videos">
+        <div class="row">
+          <input id="newId" placeholder="ID atau tempel URL videy.co/v/?id=..." style="max-width:340px" autocomplete="off" spellcheck="false">
+          <input id="newTitle" placeholder="Judul (opsional)" style="max-width:260px" autocomplete="off">
+          <button id="addBtn">Tambah</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th class="hide-sm">Judul</th>
+                <th>Aktif</th>
+                <th>Link</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="videoRows"></tbody>
+          </table>
+        </div>
+        <p class="empty" id="videoEmpty">Belum ada video.</p>
+        <p class="hint">Video nonaktif akan dialihkan ke Default Video ID saat linknya dibuka.</p>
+      </div>
+
+      <div class="tabpanel" id="panel-site" hidden>
+        <div class="grid2">
+          <label>Judul situs
+            <input id="fTitle" placeholder="BABACAN MEDIA" autocomplete="off">
+          </label>
+          <label>Default Video ID
+            <input id="fDefault" placeholder="CXdziPvQ1" autocomplete="off" spellcheck="false">
+          </label>
+          <label>CDN base URL
+            <input id="fCdn" placeholder="https://cdn2.videy.co/" autocomplete="off" spellcheck="false">
+          </label>
+          <label>URL publik Cloudflare Pages
+            <input id="fPages" placeholder="https://amjx.pages.dev" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+        <label>CDN fallback — satu URL per baris, urutan prioritas
+          <textarea id="fCdnList" rows="3" placeholder="https://cdn2.videy.co/&#10;https://cdn.videy.co/" spellcheck="false"></textarea>
+        </label>
+        <label class="checkline">
+          <input id="fSliceFallback" type="checkbox">
+          <span>
+            <span class="checktitle">Tambah SliceDrive sebagai fallback terakhir</span>
+            <span class="hint">
+              <code>cdn.slicedrive.com</code> lalu <code>cdn2.slicedrive.com</code>.
+              File sama, ETag identik dengan Videy — hanya pintu lain.
+              Dipakai kalau semua CDN prioritas gagal.
+            </span>
+          </span>
+        </label>
+        <p class="hint">Baris pertama = CDN utama. Kalau gagal dimuat, player otomatis coba baris berikutnya. CDN base dipakai sebagai <code>&lt;base&gt;&lt;id&gt;.mp4</code>.</p>
+      </div>
+
+      <div class="tabpanel" id="panel-ads" hidden>
+        <div class="grid2">
+          <label>Ad key atas (32 hex)
+            <input id="fAdTop" class="mono" autocomplete="off" spellcheck="false">
+          </label>
+          <label>Ad key bawah (32 hex)
+            <input id="fAdBottom" class="mono" autocomplete="off" spellcheck="false">
+          </label>
+          <label>Histats tag
+            <input id="fHistats" class="mono" placeholder="1,5020708,4,0,0,0,00010000" autocomplete="off" spellcheck="false">
+          </label>
+        </div>
+        <p class="hint">Key kosong atau tidak valid akan diabaikan saat halaman dimuat.</p>
+      </div>
+
+      <div class="tabpanel" id="panel-deploy" hidden>
+        <div class="row">
+          <button id="deployBtn">Trigger deploy</button>
+          <button id="refreshRuns" class="ghost">Muat ulang status</button>
+          <a id="runsLink" href="#" target="_blank" rel="noopener noreferrer" class="hint">Buka tab Actions</a>
+        </div>
+        <div class="filebox" id="runsBox">Belum ada data.</div>
+      </div>
+
+      <div class="tabpanel" id="panel-json" hidden>
+        <div class="row">
+          <button id="exportBtn" class="ghost">Unduh config.json</button>
+          <label style="flex:1;min-width:200px">Impor config.json
+            <input id="importFile" type="file" accept="application/json,.json">
+          </label>
+        </div>
+        <textarea id="jsonView" rows="22" class="mono" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const LS_KEY = 'lp.dashboard.v1';
+  const CONFIG_PATH = 'data/config.json';
+  const WORKFLOW_FILE = 'deploy-pages.yml';
+  const LOCAL_ENDPOINT = '/__local/config';
+  const ID_RE = /^[A-Za-z0-9_-]{1,80}$/;
+
+  const $ = (id) => document.getElementById(id);
+
+  const state = {
+    mode: 'local',
+    owner: '',
+    repo: '',
+    branch: 'main',
+    token: '',
+    sha: null,
+    loaded: false,
+    dirty: false,
+    config: null
+  };
+
+  function isLocal() {
+    return state.mode === 'local';
+  }
+
+  /* ---------- helpers ---------- */
+
+  function toast(message, isError) {
+    const el = $('toast');
+    el.textContent = message;
+    el.classList.toggle('err', !!isError);
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+
+  function b64Encode(text) {
+    const bytes = new TextEncoder().encode(text);
+    let bin = '';
+    for (const byte of bytes) bin += String.fromCharCode(byte);
+    return btoa(bin);
+  }
+
+  function b64Decode(text) {
+    const bin = atob(String(text).replace(/\s/g, ''));
+    const bytes = Uint8Array.from(bin, (ch) => ch.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+  }
+
+  const DEFAULT_CDNS = ['https://cdn2.videy.co/', 'https://cdn.videy.co/'];
+
+  function emptyConfig() {
+    return {
+      site: {
+        title: 'BABACAN MEDIA',
+        defaultVideoId: 'CXdziPvQ1',
+        cdnBase: DEFAULT_CDNS[0],
+        cdnBases: DEFAULT_CDNS.slice(),
+        slicedriveFallback: true,
+        pagesUrl: ''
+      },
+      ads: { top: '', bottom: '', histats: '' },
+      videos: [],
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function normalizeConfig(raw) {
+    const cfg = emptyConfig();
+    if (!raw || typeof raw !== 'object') return cfg;
+    const site = raw.site && typeof raw.site === 'object' ? raw.site : {};
+    const ads = raw.ads && typeof raw.ads === 'object' ? raw.ads : {};
+    cfg.site.title = typeof site.title === 'string' ? site.title : cfg.site.title;
+    cfg.site.defaultVideoId = ID_RE.test(site.defaultVideoId) ? site.defaultVideoId : cfg.site.defaultVideoId;
+    const rawBases = Array.isArray(site.cdnBases) ? site.cdnBases : [];
+    const bases = rawBases
+      .filter((base) => typeof base === 'string' && /^https?:\/\//i.test(base.trim()))
+      .map((base) => {
+        const trimmed = base.trim();
+        return /\/$/.test(trimmed) ? trimmed : `${trimmed}/`;
+      });
+    if (typeof site.cdnBase === 'string' && /^https?:\/\//i.test(site.cdnBase.trim())) {
+      const single = site.cdnBase.trim();
+      const normalized = /\/$/.test(single) ? single : `${single}/`;
+      if (!bases.includes(normalized)) bases.unshift(normalized);
+    }
+    cfg.site.cdnBases = bases.length ? bases : DEFAULT_CDNS.slice();
+    cfg.site.cdnBase = cfg.site.cdnBases[0];
+    cfg.site.slicedriveFallback = site.slicedriveFallback !== false;
+    cfg.site.pagesUrl = typeof site.pagesUrl === 'string' ? site.pagesUrl : '';
+    cfg.ads.top = typeof ads.top === 'string' ? ads.top : '';
+    cfg.ads.bottom = typeof ads.bottom === 'string' ? ads.bottom : '';
+    cfg.ads.histats = typeof ads.histats === 'string' ? ads.histats : '';
+    cfg.videos = (Array.isArray(raw.videos) ? raw.videos : [])
+      .filter((v) => v && ID_RE.test(v.id))
+      .map((v) => ({
+        id: v.id,
+        title: typeof v.title === 'string' ? v.title : '',
+        active: v.active !== false,
+        createdAt: typeof v.createdAt === 'string' ? v.createdAt : new Date().toISOString()
+      }));
+    cfg.updatedAt = typeof raw.updatedAt === 'string' ? raw.updatedAt : new Date().toISOString();
+    return cfg;
+  }
+
+  function canSave() {
+    if (!state.config) return false;
+    if (isLocal()) return true;
+    return Boolean(state.token && state.owner && state.repo);
+  }
+
+  function setDirty(value) {
+    state.dirty = value;
+    $('saveBtn').disabled = !value || !canSave();
+    $('saveBtn').textContent = value ? 'Simpan *' : 'Simpan';
+  }
+
+  function setConn(stateName, text) {
+    const pill = $('connPill');
+    pill.className = `pill ${stateName || ''}`.trim();
+    $('connText').textContent = text;
+  }
+
+  /* ---------- GitHub API ---------- */
+
+  function repoBase() {
+    return `/repos/${encodeURIComponent(state.owner)}/${encodeURIComponent(state.repo)}`;
+  }
+
+  async function api(path, options) {
+    const opts = options || {};
+    const headers = {
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
+      Authorization: `Bearer ${state.token}`
+    };
+    if (opts.body) headers['Content-Type'] = 'application/json';
+    Object.assign(headers, opts.headers || {});
+
+    const res = await fetch(`https://api.github.com${path}`, {
+      method: opts.method || 'GET',
+      headers,
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      cache: 'no-store'
+    });
+
+    let data = null;
+    try { data = await res.json(); } catch (_) { data = null; }
+
+    if (!res.ok) {
+      const msg = data && data.message ? data.message : `HTTP ${res.status}`;
+      const err = new Error(msg);
+      err.status = res.status;
+      throw err;
+    }
+    return data;
+  }
+
+  async function loadConfig() {
+    setConn('', 'Memuat...');
+
+    if (isLocal()) {
+      let config;
+      try {
+        const res = await fetch(LOCAL_ENDPOINT, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        config = normalizeConfig(await res.json());
+      } catch (err) {
+        if (err.message === 'HTTP 404') {
+          config = emptyConfig();
+          toast('config.json belum ada — dibuat saat simpan');
+        } else {
+          setConn('err', 'Dev server tidak aktif');
+          throw new Error('Jalankan "npm run dev" lalu buka http://localhost:3000/admin/');
+        }
+      }
+      state.config = config;
+      state.sha = null;
+      state.loaded = true;
+      renderAll();
+      setDirty(false);
+      setConn('ok', 'lokal · data/config.json');
+      $('deployPill').hidden = true;
+      return;
+    }
+
+    let file = null;
+    try {
+      file = await api(`${repoBase()}/contents/${CONFIG_PATH}?ref=${encodeURIComponent(state.branch)}`);
+    } catch (err) {
+      if (err.status !== 404) throw err;
+    }
+
+    let config;
+    if (file && file.content) {
+      state.sha = file.sha;
+      config = normalizeConfig(JSON.parse(b64Decode(file.content)));
+    } else {
+      state.sha = null;
+      config = emptyConfig();
+      toast('File config.json belum ada — akan dibuat saat simpan');
+    }
+
+    state.config = config;
+    state.loaded = true;
+    renderAll();
+    setDirty(false);
+    setConn('ok', `${state.owner}/${state.repo}@${state.branch}`);
+    checkDeploy();
+  }
+
+  async function saveConfig() {
+    if (!state.config) return;
+    $('saveBtn').disabled = true;
+    state.config.updatedAt = new Date().toISOString();
+
+    if (isLocal()) {
+      try {
+        const res = await fetch(LOCAL_ENDPOINT, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(state.config)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+        setDirty(false);
+        toast('Tersimpan ke data/config.json');
+      } catch (err) {
+        toast(`Gagal simpan: ${err.message}`, true);
+        setDirty(true);
+      }
+      return;
+    }
+
+    const body = {
+      message: `chore(config): update dari dashboard ${new Date().toISOString()}`,
+      content: b64Encode(`${JSON.stringify(state.config, null, 2)}\n`),
+      branch: state.branch
+    };
+    if (state.sha) body.sha = state.sha;
+
+    try {
+      const result = await api(`${repoBase()}/contents/${CONFIG_PATH}`, { method: 'PUT', body });
+      state.sha = result.content ? result.content.sha : state.sha;
+      setDirty(false);
+      toast('Tersimpan. Deploy berjalan otomatis.');
+      setTimeout(checkDeploy, 4000);
+    } catch (err) {
+      toast(`Gagal simpan: ${err.message}`, true);
+      setDirty(true);
+    }
+  }
+
+  async function triggerDeploy() {
+    if (!state.loaded) return toast('Muat config dulu', true);
+    if (isLocal()) return toast('Mode lokal: deploy hanya lewat GitHub', true);
+    try {
+      await api(`${repoBase()}/actions/workflows/${WORKFLOW_FILE}/dispatches`, {
+        method: 'POST',
+        body: { ref: state.branch }
+      });
+      toast('Deploy dipicu');
+      setTimeout(checkDeploy, 4000);
+    } catch (err) {
+      toast(`Gagal trigger: ${err.message}`, true);
+    }
+  }
+
+  async function checkDeploy() {
+    if (!state.loaded) return;
+    const pill = $('deployPill');
+    if (isLocal()) {
+      pill.hidden = false;
+      pill.className = 'pill warn';
+      $('deployText').textContent = 'Mode lokal';
+      $('runsBox').textContent = 'Mode lokal: perubahan ditulis langsung ke data/config.json di disk.\nDeploy ke Cloudflare lewat GitHub Actions setelah push.';
+      $('runsLink').hidden = true;
+      return;
+    }
+    $('runsLink').hidden = false;
+    pill.hidden = false;
+    $('runsLink').href = `https://github.com/${state.owner}/${state.repo}/actions/workflows/${WORKFLOW_FILE}`;
+
+    try {
+      const data = await api(`${repoBase()}/actions/runs?branch=${encodeURIComponent(state.branch)}&per_page=6`);
+      const runs = (data.workflow_runs || []).filter((run) => run.path === `.github/workflows/${WORKFLOW_FILE}`);
+
+      if (!runs.length) {
+        pill.className = 'pill warn';
+        $('deployText').textContent = 'Belum ada run';
+        $('runsBox').textContent = 'Belum ada workflow run untuk branch ini.';
+        return;
+      }
+
+      const latest = runs[0];
+      const running = latest.status !== 'completed';
+      const good = latest.conclusion === 'success';
+
+      pill.className = `pill ${running ? 'warn' : good ? 'ok' : 'err'}`;
+      $('deployText').textContent = running ? `Deploy: ${latest.status}` : `Deploy: ${latest.conclusion}`;
+
+      $('runsBox').textContent = runs.map((run) => {
+        const when = new Date(run.created_at).toLocaleString('id-ID');
+        const status = run.status === 'completed' ? run.conclusion : run.status;
+        return `#${run.run_number}  ${status.padEnd(10)}  ${when}  ${run.html_url}`;
+      }).join('\n');
+    } catch (err) {
+      pill.className = 'pill err';
+      $('deployText').textContent = 'Status tak terbaca';
+      $('runsBox').textContent = `Gagal membaca workflow runs:\n${err.message}`;
+    }
+  }
+
+  /* ---------- render ---------- */
+
+  function publicLink(id) {
+    const base = (state.config.site.pagesUrl || '').trim().replace(/\/+$/, '');
+    if (!base) return `/?mov=${encodeURIComponent(id)}`;
+    return `${base}/?mov=${encodeURIComponent(id)}`;
+  }
+
+  function renderVideos() {
+    const tbody = $('videoRows');
+    const videos = state.config.videos;
+
+    if (!videos.length) {
+      tbody.innerHTML = '';
+      $('videoEmpty').hidden = false;
+      return;
+    }
+    $('videoEmpty').hidden = true;
+
+    tbody.innerHTML = videos.map((video, index) => {
+      const link = publicLink(video.id);
+      return `<tr>
+        <td class="mono">${escapeHtml(video.id)}</td>
+        <td class="hide-sm">${escapeHtml(video.title || '—')}</td>
+        <td><input type="checkbox" data-act="toggle" data-i="${index}" ${video.active ? 'checked' : ''}></td>
+        <td>
+          <div class="linkcell">
+            <input class="mono" readonly value="${escapeHtml(link)}" data-act="link" data-i="${index}">
+            <button class="ghost" data-act="copy" data-i="${index}" title="Salin link">Salin</button>
+          </div>
+        </td>
+        <td class="hide-sm">
+          <button class="ghost" data-act="open" data-i="${index}" title="Buka">Buka</button>
+          <button class="danger" data-act="remove" data-i="${index}" title="Hapus">Hapus</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, (ch) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[ch]);
+  }
+
+  function renderFields() {
+    if (!state.config) return;
+    const { site, ads } = state.config;
+    $('fTitle').value = site.title;
+    $('fDefault').value = site.defaultVideoId;
+    $('fCdn').value = site.cdnBase;
+    $('fCdnList').value = (site.cdnBases || []).join('\n');
+    $('fSliceFallback').checked = site.slicedriveFallback !== false;
+    $('fPages').value = site.pagesUrl;
+    $('fAdTop').value = ads.top;
+    $('fAdBottom').value = ads.bottom;
+    $('fHistats').value = ads.histats;
+    $('jsonView').value = `${JSON.stringify(state.config, null, 2)}\n`;
+  }
+
+  function renderAll() {
+    renderFields();
+    renderVideos();
+  }
+
+  /* ---------- events ---------- */
+
+  $('connectBtn').addEventListener('click', async () => {
+    if (isLocal()) {
+      state.loaded = false;
+      try {
+        await loadConfig();
+        toast('Config lokal dimuat');
+      } catch (err) {
+        setConn('err', 'Dev server tidak aktif');
+        toast(err.message, true);
+      }
+      return;
+    }
+
+    const owner = $('fOwner').value.trim();
+    const repo = $('fRepo').value.trim();
+    const branch = $('fBranch').value.trim() || 'main';
+    const token = $('fToken').value.trim();
+
+    if (!owner || !repo || !token) return toast('Owner, repo, dan token wajib diisi', true);
+
+    state.owner = owner;
+    state.repo = repo;
+    state.branch = branch;
+    state.token = token;
+    state.loaded = false;
+
+    try {
+      await loadConfig();
+      persist();
+      toast('Terhubung');
+    } catch (err) {
+      setConn('err', 'Gagal terhubung');
+      toast(err.status === 401 ? 'Token tidak valid atau kedaluwarsa' : `Gagal: ${err.message}`, true);
+    }
+  });
+
+  function persist() {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      mode: state.mode,
+      owner: state.owner,
+      repo: state.repo,
+      branch: state.branch,
+      token: state.token
+    }));
+  }
+
+  function syncModeUi() {
+    const local = isLocal();
+    $('githubFields').hidden = local;
+    $('connHint').hidden = local;
+    $('modeHint').textContent = local
+      ? 'Butuh `npm run dev`. Simpan langsung menulis data/config.json di disk.'
+      : 'Commit lewat GitHub API. Perubahan memicu deploy Cloudflare.';
+    $('saveBtn').textContent = local ? 'Simpan' : 'Simpan ke GitHub';
+    if (local) $('deployPill').hidden = true;
+  }
+
+  $('fMode').addEventListener('change', async () => {
+    state.mode = $('fMode').value;
+    syncModeUi();
+    persist();
+    state.loaded = false;
+    state.config = null;
+    setDirty(false);
+    setConn('', 'Belum terhubung');
+    try {
+      await loadConfig();
+    } catch (_) { /* pesan sudah ditampilkan */ }
+  });
+
+  $('forgetBtn').addEventListener('click', () => {
+    localStorage.removeItem(LS_KEY);
+    state.owner = state.repo = state.token = '';
+    state.sha = null;
+    state.loaded = false;
+    state.config = null;
+    $('fToken').value = '';
+    setConn('', 'Belum terhubung');
+    $('deployPill').hidden = true;
+    setDirty(false);
+    toast('Kredensial dihapus dari browser');
+  });  $('saveBtn').addEventListener('click', saveConfig);
+
+  function activateTab(name) {
+    const btn = document.querySelector(`.tabs button[data-tab="${name}"]`);
+    if (!btn) return;
+    btn.click();
+  }
+
+  document.querySelectorAll('.tabs button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tabs button').forEach((other) => {
+        other.setAttribute('aria-selected', String(other === btn));
+      });
+      document.querySelectorAll('.tabpanel').forEach((panel) => {
+        panel.hidden = panel.id !== `panel-${btn.dataset.tab}`;
+      });
+      if (btn.dataset.tab === 'json') renderFields();
+      if (btn.dataset.tab === 'deploy') checkDeploy();
+      if (location.hash !== `#${btn.dataset.tab}`) {
+        history.replaceState(null, '', `#${btn.dataset.tab}`);
+      }
+    });
+  });
+
+  // Terima ID mentah atau URL penuh (videy.co, slicedrive, cdn, dll).
+  function extractVideoId(input) {
+    let value = String(input || '').trim();
+    if (!value) return '';
+
+    // URL: ambil ?id= / ?mov= / path terakhir.
+    if (/^https?:\/\//i.test(value)) {
+      try {
+        const url = new URL(value);
+        const fromQuery = url.searchParams.get('id') || url.searchParams.get('mov');
+        if (fromQuery) value = fromQuery;
+        else value = url.pathname.split('/').filter(Boolean).pop() || '';
+      } catch (_) {
+        return '';
+      }
+    }
+
+    return value.trim().replace(/\.mp4$/i, '');
+  }
+
+  $('addBtn').addEventListener('click', () => {
+    if (!state.config) return toast('Muat config dulu', true);
+    const id = extractVideoId($('newId').value);
+    const title = $('newTitle').value.trim();
+
+    if (!ID_RE.test(id)) {
+      return toast('ID tidak valid. Tempel ID (mis. jzvGRGGb1) atau URL videy.co/v/?id=...', true);
+    }
+    if (state.config.videos.some((video) => video.id === id)) return toast('ID sudah ada', true);
+
+    state.config.videos.unshift({ id, title, active: true, createdAt: new Date().toISOString() });
+    $('newId').value = '';
+    $('newTitle').value = '';
+    renderVideos();
+    renderFields();
+    setDirty(true);
+  });
+
+  // Enter di field ID = tambah.
+  $('newId').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      $('addBtn').click();
+    }
+  });
+
+  $('videoRows').addEventListener('click', async (event) => {
+    const btn = event.target.closest('button[data-act]');
+    if (!btn) return;
+    const index = Number(btn.dataset.i);
+    const video = state.config.videos[index];
+    if (!video) return;
+
+    if (btn.dataset.act === 'copy') {
+      const link = publicLink(video.id);
+      try {
+        await navigator.clipboard.writeText(link);
+        toast('Link disalin');
+      } catch (_) {
+        toast('Gagal menyalin, salin manual', true);
+      }
+    }
+    if (btn.dataset.act === 'open') {
+      window.open(publicLink(video.id), '_blank', 'noopener');
+    }
+    if (btn.dataset.act === 'remove') {
+      if (!confirm(`Hapus video ${video.id}?`)) return;
+      state.config.videos.splice(index, 1);
+      renderVideos();
+      renderFields();
+      setDirty(true);
+    }
+  });
+
+  $('videoRows').addEventListener('change', (event) => {
+    const input = event.target.closest('input[data-act="toggle"]');
+    if (!input) return;
+    const index = Number(input.dataset.i);
+    if (!state.config.videos[index]) return;
+    state.config.videos[index].active = input.checked;
+    renderFields();
+    setDirty(true);
+  });
+
+  $('videoRows').addEventListener('focusin', (event) => {
+    const input = event.target;
+    if (input.matches('input[data-act="link"]')) input.select();
+  });
+
+  [['fTitle', (cfg, v) => { cfg.site.title = v.trim() || 'BABACAN MEDIA'; }],
+   ['fDefault', (cfg, v) => { if (ID_RE.test(v.trim())) cfg.site.defaultVideoId = v.trim(); }],
+   ['fCdn', (cfg, v) => { const t = v.trim(); if (/^https?:\/\//i.test(t)) cfg.site.cdnBase = t; }],
+   ['fCdnList', (cfg, v) => {
+     const list = v.split('\n')
+       .map((line) => line.trim())
+       .filter((line) => /^https?:\/\//i.test(line))
+       .map((line) => (/\/$/.test(line) ? line : `${line}/`));
+     if (list.length) {
+       cfg.site.cdnBases = list;
+       cfg.site.cdnBase = list[0];
+     }
+   }],
+   ['fPages', (cfg, v) => { cfg.site.pagesUrl = v.trim(); }],
+   ['fAdTop', (cfg, v) => { cfg.ads.top = v.trim(); }],
+   ['fAdBottom', (cfg, v) => { cfg.ads.bottom = v.trim(); }],
+   ['fHistats', (cfg, v) => { cfg.ads.histats = v.trim(); }]
+  ].forEach(([id, apply]) => {
+    $(id).addEventListener('input', () => {
+      if (!state.config) return;
+      apply(state.config, $(id).value);
+      renderVideos();
+      setDirty(true);
+    });
+  });
+
+  $('fSliceFallback').addEventListener('change', () => {
+    if (!state.config) return;
+    state.config.site.slicedriveFallback = $('fSliceFallback').checked;
+    setDirty(true);
+  });
+
+  $('deployBtn').addEventListener('click', triggerDeploy);
+  $('refreshRuns').addEventListener('click', checkDeploy);
+
+  $('exportBtn').addEventListener('click', () => {
+    if (!state.config) return;
+    const blob = new Blob([`${JSON.stringify(state.config, null, 2)}\n`], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'config.json';
+    anchor.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+
+  $('importFile').addEventListener('change', async (event) => {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    try {
+      state.config = normalizeConfig(JSON.parse(await file.text()));
+      renderAll();
+      setDirty(true);
+      toast('Config diimpor. Klik Simpan untuk unggah.');
+    } catch (err) {
+      toast(`JSON tidak valid: ${err.message}`, true);
+    } finally {
+      event.target.value = '';
+    }
+  });
+
+  $('jsonView').addEventListener('change', () => {
+    try {
+      state.config = normalizeConfig(JSON.parse($('jsonView').value));
+      renderAll();
+      setDirty(true);
+      toast('JSON diterapkan. Klik Simpan untuk unggah.');
+    } catch (err) {
+      toast(`JSON tidak valid: ${err.message}`, true);
+    }
+  });
+
+  window.addEventListener('beforeunload', (event) => {
+    if (!state.dirty) return;
+    event.preventDefault();
+    event.returnValue = '';
+  });
+
+  /* ---------- boot ---------- */
+
+  (function restore() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (_) { saved = null; }
+    if (saved) {
+      state.mode = saved.mode === 'github' ? 'github' : 'local';
+      $('fOwner').value = saved.owner || '';
+      $('fRepo').value = saved.repo || '';
+      $('fBranch').value = saved.branch || 'main';
+      $('fToken').value = saved.token || '';
+      state.owner = saved.owner || '';
+      state.repo = saved.repo || '';
+      state.branch = saved.branch || 'main';
+      state.token = saved.token || '';
+    }
+    $('fMode').value = state.mode;
+    syncModeUi();
+
+    // Mode lokal: langsung muat. Mode GitHub: hanya jika kredensial lengkap.
+    const ready = isLocal() || (state.owner && state.repo && state.token);
+    if (ready) {
+      loadConfig().then(() => toast('Config dimuat')).catch(() => { /* pesan sudah tampil */ });
+    }
+
+    // Buka tab sesuai #hash, mis. /admin/#site
+    const initial = (location.hash || '').replace('#', '');
+    if (initial) activateTab(initial);
+  })();
+})();
+</script>
+</body>
+</html>

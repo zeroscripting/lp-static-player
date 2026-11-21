@@ -1,0 +1,33 @@
+{
+  "site": {
+    "title": "BABACAN MEDIA",
+    "defaultVideoId": "CXdziPvQ1",
+    "cdnBase": "https://cdn2.videy.co/",
+    "cdnBases": [
+      "https://cdn2.videy.co/",
+      "https://cdn.videy.co/"
+    ],
+    "slicedriveFallback": true,
+    "pagesUrl": ""
+  },
+  "ads": {
+    "top": "827191cd94c85d5cf0eac55dd14a289d",
+    "bottom": "f8dc87b166ec94e379c69117491720e5",
+    "histats": "1,5020708,4,0,0,0,00010000"
+  },
+  "videos": [
+    {
+      "id": "9Opq7MXm1",
+      "title": "Video contoh",
+      "active": true,
+      "createdAt": "2026-11-21T00:00:00.000Z"
+    },
+    {
+      "id": "jzvGRGGb1",
+      "title": "Upload baru",
+      "active": true,
+      "createdAt": "2026-11-21T08:48:12.000Z"
+    }
+  ],
+  "updatedAt": "2026-11-21T09:55:38.822Z"
+}

@@ -1,0 +1,14 @@
+{
+  "name": "lp-static-player",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Landing page preview video dengan pola /?mov=<id>",
+  "type": "module",
+  "scripts": {
+    "dev": "node tools/dev-server.mjs",
+    "check": "node --check assets/player.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
