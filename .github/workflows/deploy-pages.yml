@@ -1,4 +1,4 @@
-name: Deploy to Cloudflare Pages
+name: Deploy to Cloudflare
 
 on:
   push:
@@ -8,11 +8,13 @@ on:
       - 'assets/**'
       - 'data/**'
       - '_headers'
+      - 'tools/build.mjs'
+      - 'wrangler.jsonc'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
 concurrency:
-  group: pages-deploy
+  group: cf-deploy
   cancel-in-progress: true
 
 permissions:
@@ -25,19 +27,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build dist
-        run: |
-          mkdir -p dist
-          cp index.html dist/
-          cp -r assets dist/assets
-          cp -r data dist/data
-          if [ -f _headers ]; then cp _headers dist/_headers; fi
-          touch dist/.nojekyll
-          find dist -type f | sort
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-      - name: Deploy to Cloudflare Pages
+      - name: Build dist
+        run: node tools/build.mjs
+
+      - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy dist --project-name=${{ vars.CF_PAGES_PROJECT }} --branch=main
+          command: deploy

@@ -8,7 +8,7 @@
       "https://cdn.videy.co/"
     ],
     "slicedriveFallback": true,
-    "pagesUrl": ""
+    "pagesUrl": "https://lp-player.lisaatmaja3.workers.dev"
   },
   "ads": {
     "top": "827191cd94c85d5cf0eac55dd14a289d",

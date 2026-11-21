@@ -6,9 +6,19 @@
   "type": "module",
   "scripts": {
     "dev": "node tools/dev-server.mjs",
-    "check": "node --check assets/player.js"
+    "build": "node tools/build.mjs",
+    "check": "node --check assets/player.js",
+    "test:id": "node tools/test-extract-id.mjs",
+    "test:cdn": "node tools/check-cdn.mjs",
+    "test:cdn:sim": "node tools/sim-cdn.mjs",
+    "deploy": "wrangler deploy",
+    "deploy:create": "npx.cmd wrangler pages project create",
+    "preview": "wrangler dev"
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "wrangler": "^4.166.0"
   }
 }
