@@ -291,8 +291,8 @@
 
   const state = {
     mode: 'local',
-    owner: '',
-    repo: '',
+    owner: 'zeroscripting',
+    repo: 'lp-static-player',
     branch: 'main',
     token: '',
     sha: null,
@@ -300,6 +300,8 @@
     dirty: false,
     config: null
   };
+
+  const IS_HOSTED = !/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 
   function isLocal() {
     return state.mode === 'local';
@@ -453,7 +455,7 @@
           toast('config.json belum ada — dibuat saat simpan');
         } else {
           setConn('err', 'Dev server tidak aktif');
-          throw new Error('Jalankan "npm run dev" lalu buka http://localhost:3000/admin/');
+          throw new Error('Jalankan "npm run dev" lalu buka http://localhost:3000/docs/');
         }
       }
       state.config = config;
@@ -939,14 +941,20 @@
     try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (_) { saved = null; }
     if (saved) {
       state.mode = saved.mode === 'github' ? 'github' : 'local';
-      $('fOwner').value = saved.owner || '';
-      $('fRepo').value = saved.repo || '';
+      $('fOwner').value = saved.owner || state.owner;
+      $('fRepo').value = saved.repo || state.repo;
       $('fBranch').value = saved.branch || 'main';
       $('fToken').value = saved.token || '';
-      state.owner = saved.owner || '';
-      state.repo = saved.repo || '';
+      state.owner = saved.owner || state.owner;
+      state.repo = saved.repo || state.repo;
       state.branch = saved.branch || 'main';
       state.token = saved.token || '';
+    } else {
+      // Di hosting (GitHub Pages) mode lokal tidak mungkin: default ke GitHub.
+      if (IS_HOSTED) state.mode = 'github';
+      $('fOwner').value = state.owner;
+      $('fRepo').value = state.repo;
+      $('fBranch').value = state.branch;
     }
     $('fMode').value = state.mode;
     syncModeUi();

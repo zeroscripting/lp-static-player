@@ -164,6 +164,6 @@ const server = createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`LP local dev  ->  http://localhost:${PORT}/?mov=9Opq7MXm1`);
-  console.log(`Dashboard     ->  http://localhost:${PORT}/admin/`);
+  console.log(`Dashboard     ->  http://localhost:${PORT}/docs/`);
   console.log(`Root dir      ->  ${ROOT}`);
 });

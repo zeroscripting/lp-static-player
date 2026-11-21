@@ -1,6 +1,6 @@
-# Panduan Pakai — dari input sampai live
+﻿# Panduan Pakai â€” dari input sampai live
 
-Dokumen ini menjelaskan alur lengkap: upload video → dapat ID → masuk katalog → link dibagikan → deploy → apa yang dilihat pengunjung.
+Dokumen ini menjelaskan alur lengkap: upload video â†’ dapat ID â†’ masuk katalog â†’ link dibagikan â†’ deploy â†’ apa yang dilihat pengunjung.
 
 ---
 
@@ -8,24 +8,24 @@ Dokumen ini menjelaskan alur lengkap: upload video → dapat ID → masuk katalo
 
 ```
 [1] Upload video ke videy.co
-        │
-        │  dapat ID, mis. jzvGRGGb1
-        ▼
+        â”‚
+        â”‚  dapat ID, mis. jzvGRGGb1
+        â–¼
 [2] File video ada di CDN
         cdn2.videy.co/jzvGRGGb1.mp4
         cdn.videy.co/jzvGRGGb1.mp4        (mirror, file sama)
         cdn.slicedrive.com/jzvGRGGb1.mp4  (mirror, file sama)
-        │
-        ▼
-[3] Dashboard: catat ID → jadi link
+        â”‚
+        â–¼
+[3] Dashboard: catat ID â†’ jadi link
         https://<project>.pages.dev/?mov=jzvGRGGb1
-        │
-        ▼
-[4] Deploy (GitHub → Cloudflare Pages)
-        │
-        ▼
+        â”‚
+        â–¼
+[4] Deploy (GitHub â†’ Cloudflare Pages)
+        â”‚
+        â–¼
 [5] Pengunjung buka link
-        preview 9:16 → tekan Play → tab baru memutar video
+        preview 9:16 â†’ tekan Play â†’ tab baru memutar video
 ```
 
 Yang disimpan LP cuma **ID**. Video tidak pernah disimpan di server Anda.
@@ -35,12 +35,12 @@ Yang disimpan LP cuma **ID**. Video tidak pernah disimpan di server Anda.
 ## 1. Input: upload video
 
 1. Buka `https://videy.co/`.
-2. Pilih file video → Upload.
+2. Pilih file video â†’ Upload.
 3. Setelah selesai, Anda dapat halaman share:
    ```
    https://videy.co/v/?id=jzvGRGGb1
    ```
-4. **ID = bagian setelah `id=`** → `jzvGRGGb1`.
+4. **ID = bagian setelah `id=`** â†’ `jzvGRGGb1`.
 
 Aturan ID (dipakai LP):
 ```
@@ -50,7 +50,7 @@ Huruf besar/kecil, angka, `_`, `-`. Maksimal 80 karakter.
 
 Kalau URL ditempel dengan `.mp4` di belakang, LP tetap menerima:
 ```
-/?mov=jzvGRGGb1.mp4   →  dianggap jzvGRGGb1
+/?mov=jzvGRGGb1.mp4   â†’  dianggap jzvGRGGb1
 ```
 
 ---
@@ -78,7 +78,7 @@ Arti:
 - `404` = ID salah atau upload gagal.
 - `503` / sertifikat aneh = kena blokir ISP (bukan file hilang).
 
-Kalau nomor 1 `200`, nomor 2–4 tidak dipakai — itu cuma cadangan.
+Kalau nomor 1 `200`, nomor 2â€“4 tidak dipakai â€” itu cuma cadangan.
 
 ---
 
@@ -88,18 +88,18 @@ Kalau nomor 1 `200`, nomor 2–4 tidak dipakai — itu cuma cadangan.
 npm run dev
 ```
 
-Buka `http://localhost:3000/admin/`.
+Buka `http://localhost:3000/docs/`.
 
 ### Tab Video
-1. Isi **ID video** → `jzvGRGGb1`
-   Boleh juga tempel URL penuh — otomatis diambil ID-nya:
+1. Isi **ID video** â†’ `jzvGRGGb1`
+   Boleh juga tempel URL penuh â€” otomatis diambil ID-nya:
    ```
-   https://videy.co/v/?id=jzvGRGGb1        → jzvGRGGb1
-   https://cdn2.videy.co/jzvGRGGb1.mp4      → jzvGRGGb1
-   https://cdn.slicedrive.com/jzvGRGGb1.mp4 → jzvGRGGb1
-   https://amjx.pages.dev/?mov=jzvGRGGb1    → jzvGRGGb1
+   https://videy.co/v/?id=jzvGRGGb1        â†’ jzvGRGGb1
+   https://cdn2.videy.co/jzvGRGGb1.mp4      â†’ jzvGRGGb1
+   https://cdn.slicedrive.com/jzvGRGGb1.mp4 â†’ jzvGRGGb1
+   https://amjx.pages.dev/?mov=jzvGRGGb1    â†’ jzvGRGGb1
    ```
-2. Isi **Judul** (opsional) → mis. `Motor di puncak`
+2. Isi **Judul** (opsional) â†’ mis. `Motor di puncak`
 3. Klik **Tambah** (atau tekan Enter)
 
 Baris baru muncul dengan:
@@ -134,19 +134,19 @@ Berguna untuk menonaktifkan video bermasalah tanpa menghapus katalognya.
 | Ad key bawah | 32 karakter hex |
 | Histats tag | mis. `1,5020708,4,0,0,0,00010000` |
 
-Kosong atau format salah → otomatis diabaikan, halaman tetap jalan.
+Kosong atau format salah â†’ otomatis diabaikan, halaman tetap jalan.
 
 ### Tab Deploy
-- **Trigger deploy** — jalankan workflow GitHub Actions manual.
-- **Muat ulang status** — lihat run terakhir.
+- **Trigger deploy** â€” jalankan workflow GitHub Actions manual.
+- **Muat ulang status** â€” lihat run terakhir.
 - Daftar run: nomor, status, waktu, link.
 
 Di mode lokal, tab ini hanya menampilkan keterangan (deploy butuh GitHub).
 
 ### Tab JSON
-- **Unduh config.json** — backup.
-- **Impor config.json** — restore.
-- Editor langsung — ubah JSON, klik di luar kotak untuk menerapkan.
+- **Unduh config.json** â€” backup.
+- **Impor config.json** â€” restore.
+- Editor langsung â€” ubah JSON, klik di luar kotak untuk menerapkan.
 
 ---
 
@@ -155,22 +155,22 @@ Di mode lokal, tab ini hanya menampilkan keterangan (deploy butuh GitHub).
 ### Mode Lokal (untuk development)
 
 ```
-Dashboard  →  PUT /__local/config  →  data/config.json di disk
+Dashboard  â†’  PUT /__local/config  â†’  data/config.json di disk
 ```
 
 - Tidak butuh akun/token.
 - Butuh `npm run dev` hidup.
-- Setelah **Simpan**, refresh landing page → nilai baru aktif.
+- Setelah **Simpan**, refresh landing page â†’ nilai baru aktif.
 
 ### Mode GitHub (untuk produksi)
 
 ```
-Dashboard  →  GitHub Contents API  →  commit data/config.json
-                                          │
-                                          ▼
+Dashboard  â†’  GitHub Contents API  â†’  commit data/config.json
+                                          â”‚
+                                          â–¼
                                    GitHub Actions
-                                          │
-                                          ▼
+                                          â”‚
+                                          â–¼
                                    Cloudflare Pages
 ```
 
@@ -180,11 +180,11 @@ Dashboard  →  GitHub Contents API  →  commit data/config.json
 - Token disimpan di `localStorage` browser itu saja.
 
 Cara pakai:
-1. Tab Koneksi → **Mode penyimpanan** = `GitHub`
+1. Tab Koneksi â†’ **Mode penyimpanan** = `GitHub`
 2. Isi Owner, Repository, Branch, Token
 3. **Muat config**
-4. Edit apa pun → **Simpan ke GitHub**
-5. Tunggu ±1 menit, tab Deploy berubah `success`
+4. Edit apa pun â†’ **Simpan ke GitHub**
+5. Tunggu Â±1 menit, tab Deploy berubah `success`
 
 ---
 
@@ -224,7 +224,7 @@ Bentuk path sama. Hanya hostname beda.
 
 ## 6. Yang dilihat pengunjung
 
-### Layar 1 — preview
+### Layar 1 â€” preview
 - Kartu 9:16, maksimal 450px (350px di HP kecil).
 - Video diam, muted, tanpa kontrol.
 - Frame diambil dari detik 0.1 supaya tidak hitam.
@@ -233,20 +233,20 @@ Bentuk path sama. Hanya hostname beda.
 - Kalau video gagal: preview disembunyikan, muncul pesan.
 
 ### Tekan Play
-1. `window.open('about:blank')` dipanggil **sinkron** — tanpa `setTimeout`/`await`.
+1. `window.open('about:blank')` dipanggil **sinkron** â€” tanpa `setTimeout`/`await`.
 2. Tab baru diisi HTML player lewat `document.write`.
-3. `newTab.opener = null` — tab iklan tak bisa menyentuh tab asal.
+3. `newTab.opener = null` â€” tab iklan tak bisa menyentuh tab asal.
 4. URL tab tetap `about:blank`, tidak ada `/watch.html`, tidak ada Blob.
 
 Kalau popup diblokir:
 > Tab baru diblokir browser. Izinkan pop-up untuk situs ini lalu coba lagi.
 
-### Layar 2 — player
+### Layar 2 â€” player
 - Video `controls autoplay muted`.
-- Slot iklan atas 320×50, bawah 300×250.
+- Slot iklan atas 320Ã—50, bawah 300Ã—250.
 - Histats tracking.
 - Kalau video gagal: pesan + link "buka MP4 langsung".
-- Fallback CDN: `error` → pindah host berikutnya → `play()` lagi.
+- Fallback CDN: `error` â†’ pindah host berikutnya â†’ `play()` lagi.
 
 ---
 
@@ -254,17 +254,17 @@ Kalau popup diblokir:
 
 ### Pertama kali (sekali saja)
 1. Buat repo GitHub, push folder ini.
-2. Cloudflare → Workers & Pages → Create → Pages → **Direct Upload** → nama project.
+2. Cloudflare â†’ Workers & Pages â†’ Create â†’ Pages â†’ **Direct Upload** â†’ nama project.
 3. Cloudflare API Token (`Cloudflare Pages: Edit`) + Account ID.
-4. GitHub → Settings → Secrets and variables → Actions:
+4. GitHub â†’ Settings â†’ Secrets and variables â†’ Actions:
    - Secret `CLOUDFLARE_API_TOKEN`
    - Secret `CLOUDFLARE_ACCOUNT_ID`
    - Variable `CF_PAGES_PROJECT` = nama project
-5. GitHub → Settings → Pages → Source: branch `main`, folder `/admin`.
+5. GitHub â†’ Settings â†’ Pages â†’ Source: branch `main`, folder `/docs`.
 
 ### Setiap update
 ```
-Edit dashboard → Simpan → commit → Actions → live
+Edit dashboard â†’ Simpan â†’ commit â†’ Actions â†’ live
 ```
 Tidak perlu upload manual.
 
@@ -289,8 +289,8 @@ node --check assets/player.js        # validasi sintaks
 Halaman uji:
 ```
 http://localhost:3000/?mov=<ID>       landing
-http://localhost:3000/admin/          dashboard
-http://localhost:3000/admin/#site     langsung ke tab Situs
+http://localhost:3000/docs/          dashboard
+http://localhost:3000/docs/#site     langsung ke tab Situs
 http://localhost:3000/data/config.json
 ```
 
@@ -300,7 +300,7 @@ http://localhost:3000/data/config.json
 
 | Gejala | Cek |
 |---|---|
-| Preview hitam terus | `node tools/check-cdn.mjs <ID>` → harus 200 |
+| Preview hitam terus | `node tools/check-cdn.mjs <ID>` â†’ harus 200 |
 | Tombol Play tak membuka tab | popup blocker; izinkan popup untuk situs |
 | Tab terbuka tapi video tak jalan | CDN diblokir ISP; lihat fallback di Network tab |
 | Dashboard bilang "Dev server tidak aktif" | `npm run dev` belum jalan |

@@ -1,4 +1,4 @@
-# LP Static Player — GitHub orkestrator
+﻿# LP Static Player â€” GitHub orkestrator
 
 Landing page preview video dengan pola URL `/?mov=<id>`.
 GitHub = orkestrator (source of truth + dashboard + CI). Cloudflare Pages = hosting publik.
@@ -9,19 +9,19 @@ GitHub = orkestrator (source of truth + dashboard + CI). Cloudflare Pages = host
 
 ```
 GitHub repo
-├─ index.html              landing page (di-serve di root)
-├─ assets/style.css        style landing page
-├─ assets/player.js        logika ?mov= + popup about:blank
-├─ data/config.json        konfigurasi yang diedit dashboard
-├─ admin/index.html        dashboard (GitHub Pages)
-├─ _headers                header cache Cloudflare Pages
-└─ .github/workflows/deploy-pages.yml
+â”œâ”€ index.html              landing page (di-serve di root)
+â”œâ”€ assets/style.css        style landing page
+â”œâ”€ assets/player.js        logika ?mov= + popup about:blank
+â”œâ”€ data/config.json        konfigurasi yang diedit dashboard
+â”œâ”€ docs/index.html        dashboard (GitHub Pages)
+â”œâ”€ _headers                header cache Cloudflare Pages
+â””â”€ .github/workflows/deploy-pages.yml
 ```
 
 Alur:
 
 ```
-dashboard (admin/) --PUT contents--> data/config.json
+dashboard (docs/) --PUT contents--> data/config.json
         |
         v
 GitHub Actions (push main / workflow_dispatch)
@@ -50,14 +50,14 @@ URL video: `<site.cdnBase><id>.mp4`.
 
 ### 1. Cloudflare Pages
 
-1. Cloudflare Dashboard → Workers & Pages → Create → Pages → **Direct Upload** (bukan Git integration, karena deploy lewat Actions).
+1. Cloudflare Dashboard â†’ Workers & Pages â†’ Create â†’ Pages â†’ **Direct Upload** (bukan Git integration, karena deploy lewat Actions).
 2. Nama project, mis. `lp-player`. Ini jadi `<CF_PAGES_PROJECT>`.
-3. Buat API Token: My Profile → API Tokens → Create Token → template **Edit Cloudflare Workers** atau custom dengan izin `Account > Cloudflare Pages > Edit`.
+3. Buat API Token: My Profile â†’ API Tokens â†’ Create Token â†’ template **Edit Cloudflare Workers** atau custom dengan izin `Account > Cloudflare Pages > Edit`.
 4. Catat **Account ID** (kanan bawah dashboard Cloudflare).
 
 ### 2. Secrets & variables di GitHub
 
-Repo → Settings → Secrets and variables → Actions.
+Repo â†’ Settings â†’ Secrets and variables â†’ Actions.
 
 Secrets:
 - `CLOUDFLARE_API_TOKEN`
@@ -68,13 +68,13 @@ Variables:
 
 ### 3. Aktifkan GitHub Pages untuk dashboard
 
-Repo → Settings → Pages → Source: **Deploy from a branch** → Branch `main`, folder **`/admin`**.
+Repo â†’ Settings â†’ Pages â†’ Source: **Deploy from a branch** â†’ Branch `main`, folder **`/docs`**.
 
 Dashboard jadi di `https://<owner>.github.io/<repo>/`.
 
 ### 4. Personal Access Token untuk dashboard
 
-GitHub → Settings → Developer settings → Fine-grained tokens → Generate:
+GitHub â†’ Settings â†’ Developer settings â†’ Fine-grained tokens â†’ Generate:
 - Repository access: hanya repo ini
 - Permissions: `Contents: Read and write`, `Actions: Read and write`
 
@@ -82,11 +82,11 @@ Token disimpan di `localStorage` browser (per-device). Jangan pakai di komputer 
 
 ### 5. Isi dashboard
 
-1. Buka dashboard, isi owner/repo/branch/token → **Muat config**.
+1. Buka dashboard, isi owner/repo/branch/token â†’ **Muat config**.
 2. Tab **Situs**: isi `URL publik Cloudflare Pages`, mis. `https://lp-player.pages.dev`.
 3. Tab **Video**: tambah ID, salin link.
 4. Tab **Iklan**: ganti ad key + Histats ID milik sendiri.
-5. **Simpan ke GitHub** → Actions jalan → live dalam ~1 menit.
+5. **Simpan ke GitHub** â†’ Actions jalan â†’ live dalam ~1 menit.
 
 ## CDN prioritas
 
@@ -113,7 +113,7 @@ Token disimpan di `localStorage` browser (per-device). Jangan pakai di komputer 
 Kalau `true`, dua domain SliceDrive ditambahkan **di ujung** urutan:
 
 ```
-cdn2.videy.co  →  cdn.videy.co  →  cdn.slicedrive.com  →  cdn2.slicedrive.com
+cdn2.videy.co  â†’  cdn.videy.co  â†’  cdn.slicedrive.com  â†’  cdn2.slicedrive.com
 ```
 
 Semua host menyajikan file yang sama (ETag identik), jadi ini murni pintu cadangan. Set `false` kalau ingin fallback berhenti di Videy saja. Bisa diubah dari dashboard tab **Situs** lewat checkbox.
@@ -136,15 +136,15 @@ npm run dev
 Lalu:
 
 - Landing page: `http://localhost:3000/?mov=9Opq7MXm1`
-- Dashboard: `http://localhost:3000/admin/`
+- Dashboard: `http://localhost:3000/docs/`
 - Config: `http://localhost:3000/data/config.json`
 
 Dev server (`tools/dev-server.mjs`) punya dua peran:
 
-1. Serve file statis, `index.html` di root — bentuk URL `/?mov=<id>` sama seperti produksi.
+1. Serve file statis, `index.html` di root â€” bentuk URL `/?mov=<id>` sama seperti produksi.
 2. Endpoint tulis config:
-   - `GET  /__local/config` → baca `data/config.json`
-   - `PUT  /__local/config` → tulis `data/config.json` ke disk
+   - `GET  /__local/config` â†’ baca `data/config.json`
+   - `PUT  /__local/config` â†’ tulis `data/config.json` ke disk
 
 Dashboard punya pilihan **Mode penyimpanan**:
 
@@ -153,7 +153,7 @@ Dashboard punya pilihan **Mode penyimpanan**:
 | Lokal | `PUT /__local/config`, langsung ke disk | `npm run dev` |
 | GitHub | commit lewat GitHub API | repo + PAT |
 
-Mode lokal default. Cukup `npm run dev`, buka `/admin/`, edit, tekan **Simpan** — file `data/config.json` berubah, landing page langsung pakai nilai baru setelah refresh. Tanpa token, tanpa akun.
+Mode lokal default. Cukup `npm run dev`, buka `/docs/`, edit, tekan **Simpan** â€” file `data/config.json` berubah, landing page langsung pakai nilai baru setelah refresh. Tanpa token, tanpa akun.
 
 Kalau dev server mati, dashboard menampilkan `Dev server tidak aktif` dan mengingatkan perintah `npm run dev`.
 
